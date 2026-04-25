@@ -2,7 +2,7 @@ import axios from 'axios';
 import { store } from '../store/store';
 
 const api = axios.create({
-  baseURL: 'https://ecom-yj3z.onrender.com/api',
+  baseURL: 'https://ecom-yj3z.onrender.com/api',  // Updated to live backend
 });
 
 api.interceptors.request.use((config) => {
