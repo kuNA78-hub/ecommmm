@@ -16,19 +16,34 @@ connectDB();
 
 const app = express();
 
-// CORS configuration
-const allowedOrigins = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+const allowedOrigins = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : ['http://localhost:5173'];
+
 app.use(cors({
-  origin: allowedOrigins,
+  origin: function(origin, callback) {
+   
+    if (!origin) return callback(null, true);
+    
+    // Allow any vercel.app domain or localhost
+    if (allowedOrigins.includes(origin) || 
+        origin.includes('vercel.app') || 
+        origin.includes('localhost')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
+
 app.get('/', (req, res) => {
   res.json({ message: 'E-Commerce API is running', status: 'active' });
 });
+
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
