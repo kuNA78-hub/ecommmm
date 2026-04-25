@@ -16,18 +16,19 @@ connectDB();
 
 const app = express();
 
-
-const allowedOrigins = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : ['http://localhost:5173'];
+// CORS with your frontend URLs
+const allowedOrigins = [
+  'https://ecommmm-psi.vercel.app',
+  'https://ecommmm-git-main-kunal-kumar-prasads-projects.vercel.app',
+  'https://ecommmm-mrlz38rtw-kunal-kumar-prasads-projects.vercel.app',
+  'http://localhost:5173' // for local development
+];
 
 app.use(cors({
   origin: function(origin, callback) {
-   
+    // Allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true);
-    
-    // Allow any vercel.app domain or localhost
-    if (allowedOrigins.includes(origin) || 
-        origin.includes('vercel.app') || 
-        origin.includes('localhost')) {
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('vercel.app')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
