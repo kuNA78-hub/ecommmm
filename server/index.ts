@@ -16,7 +16,7 @@ connectDB();
 
 const app = express();
 
-app.use(cors());  // This alone sets Access-Control-Allow-Origin: *
+app.use(cors({ origin: '*' }));
 
 app.use(helmet());
 app.use(morgan('dev'));
