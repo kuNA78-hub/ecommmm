@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { store } from '../store/store';
 
+// CHANGE THIS TO YOUR LIVE BACKEND URL
 const api = axios.create({
-  baseURL: 'https://ecom-yj3z.onrender.com/api',  // Updated to live backend
+  baseURL: 'https://ecom-yj3z.onrender.com/api',
 });
 
 api.interceptors.request.use((config) => {
