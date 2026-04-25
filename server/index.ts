@@ -16,26 +16,7 @@ connectDB();
 
 const app = express();
 
-// CORS with your frontend URLs
-const allowedOrigins = [
-  'https://ecommmm-psi.vercel.app',
-  'https://ecommmm-git-main-kunal-kumar-prasads-projects.vercel.app',
-  'https://ecommmm-mrlz38rtw-kunal-kumar-prasads-projects.vercel.app',
-  'http://localhost:5173' // for local development
-];
-
-app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('vercel.app')) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
+app.use(cors());  // This alone sets Access-Control-Allow-Origin: *
 
 app.use(helmet());
 app.use(morgan('dev'));
