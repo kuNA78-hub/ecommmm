@@ -16,7 +16,23 @@ connectDB();
 
 const app = express();
 
-app.use(cors({ origin: '*' }));
+const allowedOrigins = [
+  'https://ecommmm-psi.vercel.app',
+  'http://localhost:5173',
+  'https://ecommmm-git-main-kunal-kumar-prasads-projects.vercel.app',
+  'https://ecommmm-mtbwxd0xi-kunal-kumar-prasads-projects.vercel.app'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 
 app.use(helmet());
 app.use(morgan('dev'));
