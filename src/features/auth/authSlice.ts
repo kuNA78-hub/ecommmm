@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/auth';
+
+const API_URL = 'https://ecommmm-gsre.onrender.com/api/auth';
 
 interface AuthState {
   user: any | null;
@@ -17,19 +18,29 @@ const initialState: AuthState = {
   error: null,
 };
 
-export const login = createAsyncThunk('auth/login', async (credentials: { email: string; password: string }) => {
-  const response = await axios.post(`${API_URL}/login`, credentials);
-  if (response.data.accessToken) localStorage.setItem('token', response.data.accessToken);
-  localStorage.setItem('user', JSON.stringify(response.data.user));
-  return response.data;
-});
+export const login = createAsyncThunk(
+  'auth/login',
+  async (credentials: { email: string; password: string }) => {
+    const response = await axios.post(`${API_URL}/login`, credentials);
+    if (response.data.accessToken) {
+      localStorage.setItem('token', response.data.accessToken);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
+    return response.data;
+  }
+);
 
-export const register = createAsyncThunk('auth/register', async (userData: any) => {
-  const response = await axios.post(`${API_URL}/register`, userData);
-  if (response.data.accessToken) localStorage.setItem('token', response.data.accessToken);
-  localStorage.setItem('user', JSON.stringify(response.data.user));
-  return response.data;
-});
+export const register = createAsyncThunk(
+  'auth/register',
+  async (userData: any) => {
+    const response = await axios.post(`${API_URL}/register`, userData);
+    if (response.data.accessToken) {
+      localStorage.setItem('token', response.data.accessToken);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
+    return response.data;
+  }
+);
 
 const authSlice = createSlice({
   name: 'auth',
@@ -43,14 +54,15 @@ const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(login.fulfilled, (state, action) => {
-      state.user = action.payload.user;
-      state.token = action.payload.accessToken;
-    });
-    builder.addCase(register.fulfilled, (state, action) => {
-      state.user = action.payload.user;
-      state.token = action.payload.accessToken;
-    });
+    builder
+      .addCase(login.fulfilled, (state, action) => {
+        state.user = action.payload.user;
+        state.token = action.payload.accessToken;
+      })
+      .addCase(register.fulfilled, (state, action) => {
+        state.user = action.payload.user;
+        state.token = action.payload.accessToken;
+      });
   },
 });
 
