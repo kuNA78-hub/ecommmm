@@ -12,7 +12,11 @@ export const inviteEmployee = async (req: AuthRequest, res: Response) => {
   const token = crypto.randomBytes(32).toString('hex');
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const invitation = await Invitation.create({ email, sellerId, token, expiresAt });
-  res.status(201).json({ message: 'Invitation created', inviteLink: `http://localhost:5173/register?token=${token}&role=employee` });
+  
+
+  const inviteLink = `https://ecommmm-psi.vercel.app/register?token=${token}&role=employee`;
+  
+  res.status(201).json({ message: 'Invitation created', inviteLink });
 };
 
 export const getInvitations = async (req: AuthRequest, res: Response) => {
