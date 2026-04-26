@@ -18,19 +18,9 @@ const app = express();
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true);
-
-    // Static allowed origins
-    const staticAllowed = [
-      'https://ecommmm-psi.vercel.app',
-    
-    ];
-
-    // Regex to match any Vercel preview deployment of your project
-    // This pattern matches: https://ecommmm-ANYTHING.vercel.app
+    const staticAllowed = ['https://ecommmm-psi.vercel.app'];
     const vercelPreviewPattern = /^https:\/\/ecommmm-.*\.vercel\.app$/;
-
     if (staticAllowed.includes(origin) || vercelPreviewPattern.test(origin)) {
       callback(null, true);
     } else {
