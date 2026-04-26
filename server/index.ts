@@ -16,9 +16,10 @@ connectDB();
 
 const app = express();
 
+
 const allowedOrigins = [
-  'https://ecommmm-psi.vercel.app',
-  'http://localhost:5173',
+  'https://ecommmm-psi.vercel.app',             
+  'http://localhost:5173',                      
   'https://ecommmm-git-main-kunal-kumar-prasads-projects.vercel.app',
   'https://ecommmm-mtbwxd0xi-kunal-kumar-prasads-projects.vercel.app'
 ];
