@@ -16,23 +16,30 @@ connectDB();
 
 const app = express();
 
-
-const allowedOrigins = [
-  'https://ecommmm-psi.vercel.app',             
-  'http://localhost:5173',                      
-  'https://ecommmm-git-main-kunal-kumar-prasads-projects.vercel.app',
-  'https://ecommmm-mtbwxd0xi-kunal-kumar-prasads-projects.vercel.app'
-];
-
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+
+    // Static allowed origins
+    const staticAllowed = [
+      'https://ecommmm-psi.vercel.app',
+    
+    ];
+
+    // Regex to match any Vercel preview deployment of your project
+    // This pattern matches: https://ecommmm-ANYTHING.vercel.app
+    const vercelPreviewPattern = /^https:\/\/ecommmm-.*\.vercel\.app$/;
+
+    if (staticAllowed.includes(origin) || vercelPreviewPattern.test(origin)) {
       callback(null, true);
     } else {
+      console.log(`❌ CORS blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true,
+  optionsSuccessStatus: 200
 }));
 
 app.use(helmet());
