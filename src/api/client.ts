@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { store } from '../store/store';
 
+
 const api = axios.create({
   baseURL: 'https://ecommmm-gsre.onrender.com/api',   
 });
