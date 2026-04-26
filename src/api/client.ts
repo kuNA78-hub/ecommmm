@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { store } from '../store/store';
 
-// Use environment variable, fallback to live backend URL
-const API_URL = import.meta.env.VITE_API_URL || 'https://ecommmm-gsre.onrender.com/api';
+// ✅ Always use the environment variable; fallback to a live backend URL
+const API_URL = import.meta.env.VITE_API_URL;
 
 const api = axios.create({
   baseURL: API_URL,
