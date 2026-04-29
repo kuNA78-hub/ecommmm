@@ -1,31 +1,25 @@
-import { RequestHandler } from 'express';
+import { Response } from 'express';
+import { AuthRequest } from '../middleware/auth';
 import Invitation from '../models/Invitation';
 import crypto from 'crypto';
-import { sendSuccess, sendError } from '../utils/responseHelper';
-import { logInfo } from '../utils/logger';
+import { AppError } from '../middleware/errorHandler';
 
-export const inviteUser: RequestHandler = async (req, res, next) => {
-  try {
-    const { email } = req.body;
-    const invitedBy = req.userId; 
-
-    const existing = await Invitation.findOne({ email, status: 'pending' });
-    if (existing) return sendError(res, 400, 'Pending invitation already sent to this email');
-
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); 
-
-    const invitation = await Invitation.create({ email, invitedBy, token, expiresAt });
-    logInfo(`Invitation created for ${email} by admin ${invitedBy}`);
-
-    const inviteLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/register?token=${token}&role=user`;
-    return sendSuccess(res, 201, 'Invitation created', { inviteLink, token });
-  } catch (error) { next(error); }
+export const inviteEmployee = async (req: AuthRequest, res: Response) => {
+  const { email } = req.body;
+  const sellerId = req.user.id;
+  const existing = await Invitation.findOne({ email, sellerId, status: 'pending' });
+  if (existing) throw new AppError('Pending invitation already sent', 400);
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const invitation = await Invitation.create({ email, sellerId, token, expiresAt });
+  
+  const inviteLink = `https://ecommmm-psi.vercel.app/register?token=${token}&role=employee`;
+  
+  res.status(201).json({ message: 'Invitation created', inviteLink });
 };
 
-export const getInvitations: RequestHandler = async (req, res, next) => {
-  try {
-    const invites = await Invitation.find({ invitedBy: req.userId }).populate('invitedBy', 'username email');
-    return sendSuccess(res, 200, 'Invitations fetched', invites);
-  } catch (error) { next(error); }
+export const getInvitations = async (req: AuthRequest, res: Response) => {
+  const sellerId = req.user.id;
+  const invites = await Invitation.find({ sellerId });
+  res.json(invites);
 };
