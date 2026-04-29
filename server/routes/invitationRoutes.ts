@@ -1,10 +1,12 @@
-import express from 'express';
-import { authenticateUser, isAdmin } from '../middleware/auth';
-import { inviteUser, getInvitations } from '../controllers/invitationController';
+import { Router } from 'express';
+import { protect } from '../middleware/auth';
+import { restrictTo } from '../middleware/roleCheck';
+import { inviteEmployee, getInvitations } from '../controllers/invitationController';
 
-const router = express.Router();
-router.use(authenticateUser, isAdmin);
-router.post('/', inviteUser);
-router.get('/', getInvitations);
+const router = Router();
+router.use(protect);
+router.post('/', restrictTo('seller'), inviteEmployee);
+router.get('/', restrictTo('seller'), getInvitations);
 
 export default router;
+
