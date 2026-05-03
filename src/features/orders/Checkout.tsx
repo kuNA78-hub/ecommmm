@@ -15,7 +15,7 @@ export default function Checkout() {
   const [address, setAddress] = useState({ street: '', city: '', zip: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
   const handleAddressNext = () => {
@@ -31,10 +31,18 @@ export default function Checkout() {
     setLoading(true);
     setError(null);
     try {
-      await api.post('/orders', {
-        items: items.map(i => ({ productId: i.productId, quantity: i.quantity })),
+      // ✅ Build payload with ALL required fields: name, price, productId, quantity, totalAmount
+      const orderData = {
+        items: items.map(i => ({
+          productId: i.productId,
+          name: i.name,          // backend expects string
+          price: i.price,        // backend expects number
+          quantity: i.quantity,
+        })),
+        totalAmount: total,      // backend expects number
         shippingAddress: address,
-      });
+      };
+      await api.post('/orders', orderData);
       dispatch(clearCart());
       setActiveStep(2);
     } catch (err: any) {
@@ -58,7 +66,7 @@ export default function Checkout() {
   return (
     <Container maxWidth="md" sx={{ mt: 6, pb: 8 }}>
       <Typography variant="h4" align="center" sx={{ mb: 4, fontWeight: 'bold' }}>Checkout</Typography>
-      
+
       <Stepper activeStep={activeStep} sx={{ mb: 6 }}>
         {steps.map(label => (
           <Step key={label}>
@@ -75,24 +83,24 @@ export default function Checkout() {
             <Paper sx={{ p: 4, borderRadius: 3 }}>
               <Typography variant="h6" sx={{ mb: 3 }}>Shipping Address</Typography>
               <Stack spacing={3}>
-                <TextField 
-                  fullWidth 
-                  label="Street Address" 
-                  value={address.street} 
-                  onChange={e => setAddress({...address, street: e.target.value})} 
+                <TextField
+                  fullWidth
+                  label="Street Address"
+                  value={address.street}
+                  onChange={e => setAddress({...address, street: e.target.value})}
                 />
                 <Stack direction="row" spacing={2}>
-                  <TextField 
-                    fullWidth 
-                    label="City" 
-                    value={address.city} 
-                    onChange={e => setAddress({...address, city: e.target.value})} 
+                  <TextField
+                    fullWidth
+                    label="City"
+                    value={address.city}
+                    onChange={e => setAddress({...address, city: e.target.value})}
                   />
-                  <TextField 
-                    fullWidth 
-                    label="ZIP Code" 
-                    value={address.zip} 
-                    onChange={e => setAddress({...address, zip: e.target.value})} 
+                  <TextField
+                    fullWidth
+                    label="ZIP Code"
+                    value={address.zip}
+                    onChange={e => setAddress({...address, zip: e.target.value})}
                   />
                 </Stack>
                 <Button variant="contained" size="large" onClick={handleAddressNext} sx={{ mt: 2, height: 48 }}>
@@ -140,11 +148,11 @@ export default function Checkout() {
             </Box>
             <Stack direction="row" spacing={2}>
               <Button fullWidth variant="outlined" onClick={() => setActiveStep(0)} disabled={loading}>Back</Button>
-              <Button 
-                fullWidth 
-                variant="contained" 
-                color="success" 
-                onClick={handlePaymentSubmit} 
+              <Button
+                fullWidth
+                variant="contained"
+                color="success"
+                onClick={handlePaymentSubmit}
                 disabled={loading}
                 sx={{ height: 48 }}
               >
