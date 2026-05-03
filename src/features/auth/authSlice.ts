@@ -3,12 +3,14 @@ import api from '../../api/client';
 
 interface AuthState {
   user: any | null;
+  token: string | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: AuthState = {
   user: JSON.parse(localStorage.getItem('user') || 'null'),
+  token: localStorage.getItem('token') || null,
   loading: false,
   error: null,
 };
@@ -18,8 +20,10 @@ export const login = createAsyncThunk(
   async (credentials: { email: string; password: string }, { rejectWithValue }) => {
     try {
       const response = await api.post('/auth/login', credentials);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      return response.data;
+      const { user, accessToken } = response.data;
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('token', accessToken);
+      return { user, accessToken };
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'The email or password you entered is incorrect.'
@@ -33,8 +37,10 @@ export const register = createAsyncThunk(
   async (userData: any, { rejectWithValue }) => {
     try {
       const response = await api.post('/auth/register', userData);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      return response.data;
+      const { user, accessToken } = response.data;
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('token', accessToken);
+      return { user, accessToken };
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Registration failed. Please check your information.'
@@ -48,8 +54,11 @@ export const logout = createAsyncThunk(
   async () => {
     try {
       await api.post('/auth/logout');
+    } catch (e) {
+      // ignore
     } finally {
       localStorage.removeItem('user');
+      localStorage.removeItem('token');
     }
   }
 );
@@ -71,6 +80,7 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.user;
+        state.token = action.payload.accessToken;
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
@@ -83,6 +93,7 @@ const authSlice = createSlice({
       .addCase(register.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.user;
+        state.token = action.payload.accessToken;
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
@@ -90,6 +101,7 @@ const authSlice = createSlice({
       })
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
+        state.token = null;
       });
   },
 });
