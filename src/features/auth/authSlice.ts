@@ -20,10 +20,10 @@ export const login = createAsyncThunk(
   async (credentials: { email: string; password: string }, { rejectWithValue }) => {
     try {
       const response = await api.post('/auth/login', credentials);
-      const { user, accessToken } = response.data;
-      // Save both user and token in localStorage
+      const { user, accessToken, refreshToken } = response.data;
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('token', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
       return { user, accessToken };
     } catch (error: any) {
       return rejectWithValue(
@@ -38,9 +38,10 @@ export const register = createAsyncThunk(
   async (userData: any, { rejectWithValue }) => {
     try {
       const response = await api.post('/auth/register', userData);
-      const { user, accessToken } = response.data;
+      const { user, accessToken, refreshToken } = response.data;
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('token', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
       return { user, accessToken };
     } catch (error: any) {
       return rejectWithValue(
@@ -56,10 +57,11 @@ export const logout = createAsyncThunk(
     try {
       await api.post('/auth/logout');
     } catch (e) {
-      // ignore network errors during logout
+      // ignore network errors
     } finally {
       localStorage.removeItem('user');
       localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
     }
   }
 );
