@@ -14,7 +14,9 @@ export default function Cart() {
 
   const handleQuantityChange = (productId: string, val: string) => {
     const quantity = parseInt(val);
-    if (isNaN(quantity) || quantity < 1) return;
+    if (isNaN(quantity) || quantity < 1) {
+      return;
+    }
     dispatch(updateQuantity({ productId, quantity }));
   };
 

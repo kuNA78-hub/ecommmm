@@ -24,9 +24,6 @@ export default function Register() {
   const token = searchParams.get('token');
   const { error, loading } = useSelector((state: any) => state.auth);
 
-  // Default role is 'buyer' unless token is present
-  const defaultRole = token ? 'buyer' : 'buyer';
-
   const { register: formRegister, handleSubmit, formState: { errors } } = useForm<RegisterForm>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -38,15 +35,14 @@ export default function Register() {
     },
   });
 
-  // Clear errors on mount
   useEffect(() => {
     dispatch(clearError());
   }, [dispatch]);
 
   const onSubmit = async (data: RegisterForm) => {
     const submitData = { ...data };
+    
     if (token) {
-      // Overriding to 'employee' for backend logic
       (submitData as any).role = 'employee';
       submitData.inviteToken = token;
     }

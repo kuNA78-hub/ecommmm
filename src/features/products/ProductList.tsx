@@ -7,7 +7,14 @@ import { useAppSelector } from '../../store/store';
 import { Container, Grid, Card, CardContent, Typography, CardActions, Button, TextField, MenuItem, Box, CardMedia, CircularProgress, Alert, Snackbar } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-interface Product { _id: string; name: string; price: number; stock: number; category: string; images: string[]; }
+interface Product { 
+  _id: string; 
+  name: string; 
+  price: number; 
+  stock: number; 
+  category: string; 
+  images: string[]; 
+}
 
 const fetchProducts = async (category: string, search: string) => {
   const params: any = {};
@@ -17,7 +24,6 @@ const fetchProducts = async (category: string, search: string) => {
   return res.data;
 };
 
-// Simple debouncing hook
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
   useEffect(() => {
@@ -32,7 +38,11 @@ export default function ProductList() {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 500);
   
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+  const [snackbar, setSnackbar] = useState({ 
+    open: false, 
+    message: '', 
+    severity: 'success' as 'success' | 'error' 
+  });
 
   const dispatch = useDispatch();
   const { user } = useAppSelector((state) => state.auth);
@@ -42,22 +52,37 @@ export default function ProductList() {
     queryFn: () => fetchProducts(selectedCategory, debouncedSearch),
   });
 
-  // Fetch all categories once (logic improvement)
   const { data: allProducts = [] } = useQuery<Product[]>({
     queryKey: ['all-products-for-categories'],
     queryFn: () => fetchProducts('', ''),
-    staleTime: 1000 * 60 * 5, // 5 mins
+    staleTime: 1000 * 60 * 5,
   });
   
   const categories: string[] = Array.from(new Set(allProducts.map((p: Product) => p.category)));
 
   const handleAddToCart = (product: Product) => {
     if (!user || user.role !== 'buyer') {
-      setSnackbar({ open: true, message: 'Please login as a buyer to add items to cart.', severity: 'error' });
+      setSnackbar({ 
+        open: true, 
+        message: 'Please login as a buyer to add items to cart.', 
+        severity: 'error' 
+      });
       return;
     }
-    dispatch(addToCart({ productId: product._id, name: product.name, price: product.price, quantity: 1, image: product.images?.[0] }));
-    setSnackbar({ open: true, message: `${product.name} added to cart!`, severity: 'success' });
+    
+    dispatch(addToCart({ 
+      productId: product._id, 
+      name: product.name, 
+      price: product.price, 
+      quantity: 1, 
+      image: product.images?.[0] 
+    }));
+    
+    setSnackbar({ 
+      open: true, 
+      message: `${product.name} added to cart!`, 
+      severity: 'success' 
+    });
   };
 
   return (
@@ -103,7 +128,14 @@ export default function ProductList() {
         <Grid container spacing={3}>
           {products.map((product: Product) => (
             <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={product._id}>
-              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 2, transition: 'transform 0.2s', '&:hover': { transform: 'translateY(-4px)', boxShadow: 4 } }}>
+              <Card sx={{ 
+                height: '100%', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                borderRadius: 2, 
+                transition: 'transform 0.2s', 
+                '&:hover': { transform: 'translateY(-4px)', boxShadow: 4 } 
+              }}>
                 <Link to={`/product/${product._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                   {product.images?.[0] ? (
                     <CardMedia component="img" height="200" image={product.images[0]} alt={product.name} sx={{ objectFit: 'cover' }} />

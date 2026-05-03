@@ -31,7 +31,6 @@ export default function Checkout() {
     setLoading(true);
     setError(null);
     try {
-      // Security Improvement: Only send productId and quantity
       await api.post('/orders', {
         items: items.map(i => ({ productId: i.productId, quantity: i.quantity })),
         shippingAddress: address,
@@ -61,7 +60,11 @@ export default function Checkout() {
       <Typography variant="h4" align="center" sx={{ mb: 4, fontWeight: 'bold' }}>Checkout</Typography>
       
       <Stepper activeStep={activeStep} sx={{ mb: 6 }}>
-        {steps.map(label => <Step key={label}><StepLabel>{label}</StepLabel></Step>)}
+        {steps.map(label => (
+          <Step key={label}>
+            <StepLabel>{label}</StepLabel>
+          </Step>
+        ))}
       </Stepper>
 
       {error && <Alert severity="error" sx={{ mb: 4 }}>{error}</Alert>}

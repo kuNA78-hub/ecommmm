@@ -13,6 +13,7 @@ const theme = createTheme({
     primary: { main: '#1976d2' },
     secondary: { main: '#dc004e' },
   },
+
 });
 
 const queryClient = new QueryClient();
@@ -29,3 +30,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </Provider>
   </React.StrictMode>
 );
+
+

@@ -9,7 +9,15 @@ import ShoppingCart from '@mui/icons-material/ShoppingCart';
 import FlashOn from '@mui/icons-material/FlashOn';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 
-interface Product { _id: string; name: string; price: number; stock: number; category: string; description: string; images: string[]; }
+interface Product { 
+  _id: string; 
+  name: string; 
+  price: number; 
+  stock: number; 
+  category: string; 
+  description: string; 
+  images: string[]; 
+}
 
 export default function ProductDetail() {
     const { id } = useParams();
@@ -27,7 +35,6 @@ export default function ProductDetail() {
         const fetchProduct = async () => {
             try {
                 setLoading(true);
-                // logic improvement: use the new ID-specific endpoint
                 const res = await api.get(`/products/public/${id}`);
                 setProduct(res.data);
             } catch (err: any) { 
@@ -36,37 +43,66 @@ export default function ProductDetail() {
                 setLoading(false); 
             }
         };
-        if (id) fetchProduct();
+        
+        if (id) {
+          fetchProduct();
+        }
     }, [id]);
 
     const handleAddToCart = () => {
         if (!product) return;
+        
         if (!user || user.role !== 'buyer') {
             setSnackbar({ open: true, message: 'Please login as a buyer to shop.' });
             return;
         }
-        dispatch(addToCart({ productId: product._id, name: product.name, price: product.price, quantity: 1, image: product.images?.[0] }));
+        
+        dispatch(addToCart({ 
+          productId: product._id, 
+          name: product.name, 
+          price: product.price, 
+          quantity: 1, 
+          image: product.images?.[0] 
+        }));
+        
         setSnackbar({ open: true, message: 'Added to cart!' });
     };
 
     const handleBuyNow = () => {
         if (!product) return;
+        
         if (!user || user.role !== 'buyer') {
             setSnackbar({ open: true, message: 'Please login as a buyer to shop.' });
             return;
         }
-        dispatch(addToCart({ productId: product._id, name: product.name, price: product.price, quantity: 1, image: product.images?.[0] }));
+        
+        dispatch(addToCart({ 
+          productId: product._id, 
+          name: product.name, 
+          price: product.price, 
+          quantity: 1, 
+          image: product.images?.[0] 
+        }));
+        
         navigate('/checkout');
     };
 
-    if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}><CircularProgress /></Box>;
+    if (loading) {
+      return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
+          <CircularProgress />
+        </Box>
+      );
+    }
     
-    if (error || !product) return (
+    if (error || !product) {
+      return (
         <Container sx={{ mt: 8, textAlign: 'center' }}>
             <Typography variant="h5" color="error">{error || 'Product not found'}</Typography>
             <Button variant="outlined" sx={{ mt: 2 }} onClick={() => navigate('/')}>Back to Products</Button>
         </Container>
-    );
+      );
+    }
 
     return (
         <Container sx={{ mt: 4, pb: 8 }}>
@@ -161,8 +197,6 @@ export default function ProductDetail() {
                                 Buy Now
                             </Button>
                         </Stack>
-
-                        
                     </Box>
                 </Grid>
             </Grid>

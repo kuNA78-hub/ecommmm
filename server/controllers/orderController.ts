@@ -12,10 +12,12 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
   let totalCalculated = 0;
   const processedItems = [];
 
-  // Verify prices and stock on server side
   for (const item of data.items) {
     const product = await Product.findById(item.productId);
-    if (!product) throw new AppError(`Product ${item.productId} not found`, 404);
+    if (!product) {
+      throw new AppError(`Product ${item.productId} not found`, 404);
+    }
+
     if (product.stock < item.quantity) {
       throw new AppError(`Insufficient stock for ${product.name}. Available: ${product.stock}`, 400);
     }
@@ -29,7 +31,6 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
     });
   }
 
-  // Use first product's sellerId for the order (simplified logic)
   const firstProduct = await Product.findById(data.items[0].productId);
   const sellerId = firstProduct!.sellerId;
 
@@ -42,7 +43,6 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
     status: 'pending' 
   });
 
-  // reduce stock securely
   for (const item of data.items) {
     await Product.updateOne(
       { _id: item.productId, stock: { $gte: item.quantity } }, 
@@ -62,10 +62,17 @@ export const getSellerOrders = async (req: AuthRequest, res: Response) => {
 export const updateOrderStatus = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
   const { status } = req.body;
+
   const order = await Order.findById(id);
-  if (!order) throw new AppError('Order not found', 404);
+  if (!order) {
+    throw new AppError('Order not found', 404);
+  }
+
   const sellerId = req.user.role === 'seller' ? req.user.id : req.user.sellerId;
-  if (order.sellerId.toString() !== sellerId) throw new AppError('Unauthorized', 403);
+  if (order.sellerId.toString() !== sellerId) {
+    throw new AppError('Unauthorized', 403);
+  }
+
   order.status = status;
   await order.save();
   res.json(order);

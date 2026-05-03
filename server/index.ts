@@ -19,13 +19,16 @@ const app = express();
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      return callback(null, true);
+    }
+    
     const staticAllowed = ['http://localhost:5173', 'https://ecommmm-psi.vercel.app/'];
     const vercelPreviewPattern = /^https:\/\/ecommmm-.*\.vercel\.app$/;
+    
     if (staticAllowed.includes(origin) || vercelPreviewPattern.test(origin)) {
       callback(null, true);
     } else {
-      console.log(`❌ CORS blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -55,4 +58,6 @@ app.get('/health', (req, res) => {
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

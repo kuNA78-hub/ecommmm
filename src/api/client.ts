@@ -6,7 +6,6 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Flag to prevent multiple refresh calls
 let isRefreshing = false;
 let failedQueue: any[] = [];
 
@@ -26,7 +25,6 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // If error is 401 and we haven't retried yet
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
-import User, { IUser, UserRole } from '../models/User';
+import User from '../models/User';
 import Invitation from '../models/Invitation';
 import { registerSchema, loginSchema } from '../utils/validationSchemas';
 import { generateTokens } from '../utils/generateToken';
@@ -12,14 +12,14 @@ const setTokenCookies = (res: Response, tokens: { accessToken: string; refreshTo
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    maxAge: 15 * 60 * 1000, // 15 mins
+    maxAge: 15 * 60 * 1000,
   });
 
   res.cookie('refreshToken', tokens.refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };
 
@@ -28,14 +28,20 @@ export const register = async (req: Request, res: Response) => {
   const { name, email, password, role, inviteToken } = data;
 
   const existingUser = await User.findOne({ email });
-  if (existingUser) throw new AppError('An account with this email already exists.', 400);
+  if (existingUser) {
+    throw new AppError('An account with this email already exists.', 400);
+  }
 
   let sellerId: mongoose.Types.ObjectId | undefined;
   
   if (role === 'employee') {
-    if (!inviteToken) throw new AppError('Invitation token is required for employee registration.', 400);
+    if (!inviteToken) {
+      throw new AppError('Invitation token is required for employee registration.', 400);
+    }
     const invite = await Invitation.findOne({ token: inviteToken, status: 'pending' });
-    if (!invite || invite.expiresAt < new Date()) throw new AppError('This invitation token is invalid or has expired.', 400);
+    if (!invite || invite.expiresAt < new Date()) {
+      throw new AppError('This invitation token is invalid or has expired.', 400);
+    }
     sellerId = invite.sellerId;
     await Invitation.updateOne({ _id: invite._id }, { status: 'accepted' });
   }
@@ -68,14 +74,17 @@ export const login = async (req: Request, res: Response) => {
 
 export const refreshToken = async (req: Request, res: Response) => {
   const token = req.cookies.refreshToken;
-  if (!token) throw new AppError('Session expired. Please log in again.', 401);
+  if (!token) {
+    throw new AppError('Session expired. Please log in again.', 401);
+  }
 
   try {
     const decoded: any = jwt.verify(token, process.env.JWT_REFRESH_SECRET as string);
     const user = await User.findById(decoded.id);
-    if (!user) throw new Error();
+    if (!user) {
+      throw new Error();
+    }
 
-    // Refresh Token Rotation
     const tokens = generateTokens(user._id.toString(), user.role, user.sellerId?.toString());
     setTokenCookies(res, tokens);
 

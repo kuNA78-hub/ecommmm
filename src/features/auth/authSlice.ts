@@ -21,7 +21,9 @@ export const login = createAsyncThunk(
       localStorage.setItem('user', JSON.stringify(response.data.user));
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'The email or password you entered is incorrect.');
+      return rejectWithValue(
+        error.response?.data?.message || 'The email or password you entered is incorrect.'
+      );
     }
   }
 );
@@ -34,7 +36,9 @@ export const register = createAsyncThunk(
       localStorage.setItem('user', JSON.stringify(response.data.user));
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Registration failed. Please check your information.');
+      return rejectWithValue(
+        error.response?.data?.message || 'Registration failed. Please check your information.'
+      );
     }
   }
 );

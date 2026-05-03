@@ -23,7 +23,6 @@ export default function Login() {
     resolver: zodResolver(schema),
   });
 
-  // Clear any existing errors when the component mounts
   useEffect(() => {
     dispatch(clearError());
   }, [dispatch]);
