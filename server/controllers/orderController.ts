@@ -8,47 +8,48 @@ import { AppError } from '../middleware/errorHandler';
 export const createOrder = async (req: AuthRequest, res: Response) => {
   const data = orderSchema.parse(req.body);
   const buyerId = req.user.id;
-  
+
   let totalCalculated = 0;
   const processedItems = [];
+  let sellerId: string | undefined;
 
+  // Validate products and collect sellerId
   for (const item of data.items) {
     const product = await Product.findById(item.productId);
     if (!product) {
       throw new AppError(`Product ${item.productId} not found`, 404);
     }
-
     if (product.stock < item.quantity) {
       throw new AppError(`Insufficient stock for ${product.name}. Available: ${product.stock}`, 400);
     }
-    
+    if (!sellerId) sellerId = product.sellerId.toString();
     totalCalculated += product.price * item.quantity;
     processedItems.push({
       productId: item.productId,
       name: product.name,
       price: product.price,
-      quantity: item.quantity
+      quantity: item.quantity,
     });
   }
 
-  const firstProduct = await Product.findById(data.items[0].productId);
-  const sellerId = firstProduct!.sellerId;
+  if (!sellerId) throw new AppError('No valid products in order', 400);
 
-  const order = await Order.create({ 
-    items: processedItems, 
-    buyerId, 
-    sellerId, 
-    totalAmount: totalCalculated,
-    shippingAddress: data.shippingAddress,
-    status: 'pending' 
-  });
-
+  // Deduct stock (safe – only reduces if enough stock)
   for (const item of data.items) {
     await Product.updateOne(
-      { _id: item.productId, stock: { $gte: item.quantity } }, 
+      { _id: item.productId, stock: { $gte: item.quantity } },
       { $inc: { stock: -item.quantity } }
     );
   }
+
+  const order = await Order.create({
+    items: processedItems,
+    buyerId,
+    sellerId,
+    totalAmount: totalCalculated,
+    shippingAddress: data.shippingAddress,
+    status: 'pending',
+  });
 
   res.status(201).json(order);
 };
@@ -62,17 +63,10 @@ export const getSellerOrders = async (req: AuthRequest, res: Response) => {
 export const updateOrderStatus = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
   const { status } = req.body;
-
   const order = await Order.findById(id);
-  if (!order) {
-    throw new AppError('Order not found', 404);
-  }
-
+  if (!order) throw new AppError('Order not found', 404);
   const sellerId = req.user.role === 'seller' ? req.user.id : req.user.sellerId;
-  if (order.sellerId.toString() !== sellerId) {
-    throw new AppError('Unauthorized', 403);
-  }
-
+  if (order.sellerId.toString() !== sellerId) throw new AppError('Unauthorized', 403);
   order.status = status;
   await order.save();
   res.json(order);
