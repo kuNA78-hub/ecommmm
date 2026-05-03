@@ -20,7 +20,7 @@ const app = express();
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    const staticAllowed = ['http://localhost:5173', 'http://localhost:5174'];
+    const staticAllowed = ['http://localhost:5173', 'https://ecommmm-psi.vercel.app/'];
     const vercelPreviewPattern = /^https:\/\/ecommmm-.*\.vercel\.app$/;
     if (staticAllowed.includes(origin) || vercelPreviewPattern.test(origin)) {
       callback(null, true);
