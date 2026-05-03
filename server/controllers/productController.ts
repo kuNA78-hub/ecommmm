@@ -39,6 +39,13 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
   res.status(204).send();
 };
 
+export const getProductById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const product = await Product.findById(id);
+  if (!product) throw new AppError('Product not found', 404);
+  res.json(product);
+};
+
 export const getAllProducts = async (req: Request, res: Response) => {
   const { category, search } = req.query;
   let filter: any = {};

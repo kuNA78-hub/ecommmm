@@ -8,15 +8,48 @@ import { AppError } from '../middleware/errorHandler';
 export const createOrder = async (req: AuthRequest, res: Response) => {
   const data = orderSchema.parse(req.body);
   const buyerId = req.user.id;
-  // assume all items belong to same seller for simplicity (first product's seller)
-  const firstProduct = await Product.findById(data.items[0].productId);
-  if (!firstProduct) throw new AppError('Product not found', 404);
-  const sellerId = firstProduct.sellerId;
-  const order = await Order.create({ ...data, buyerId, sellerId, status: 'pending' });
-  // reduce stock
+  
+  let totalCalculated = 0;
+  const processedItems = [];
+
+  // Verify prices and stock on server side
   for (const item of data.items) {
-    await Product.updateOne({ _id: item.productId }, { $inc: { stock: -item.quantity } });
+    const product = await Product.findById(item.productId);
+    if (!product) throw new AppError(`Product ${item.productId} not found`, 404);
+    if (product.stock < item.quantity) {
+      throw new AppError(`Insufficient stock for ${product.name}. Available: ${product.stock}`, 400);
+    }
+    
+    totalCalculated += product.price * item.quantity;
+    processedItems.push({
+      productId: item.productId,
+      name: product.name,
+      price: product.price,
+      quantity: item.quantity
+    });
   }
+
+  // Use first product's sellerId for the order (simplified logic)
+  const firstProduct = await Product.findById(data.items[0].productId);
+  const sellerId = firstProduct!.sellerId;
+
+  const order = await Order.create({ 
+    items: processedItems, 
+    buyerId, 
+    sellerId, 
+    totalAmount: totalCalculated,
+    shippingAddress: data.shippingAddress,
+    status: 'pending' 
+  });
+
+  // reduce stock securely
+  for (const item of data.items) {
+    await Product.updateOne(
+      { _id: item.productId, stock: { $gte: item.quantity } }, 
+      { $inc: { stock: -item.quantity } }
+    );
+  }
+
   res.status(201).json(order);
 };
 

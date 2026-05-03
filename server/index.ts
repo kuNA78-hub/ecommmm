@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 import connectDB from './config/db';
 import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './routes/authRoutes';
@@ -19,7 +20,7 @@ const app = express();
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    const staticAllowed = ['https://ecommmm-psi.vercel.app'];
+    const staticAllowed = ['http://localhost:5173', 'http://localhost:5174'];
     const vercelPreviewPattern = /^https:\/\/ecommmm-.*\.vercel\.app$/;
     if (staticAllowed.includes(origin) || vercelPreviewPattern.test(origin)) {
       callback(null, true);
@@ -35,6 +36,7 @@ app.use(cors({
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(cookieParser());
 
 app.get('/', (req, res) => {
   res.json({ message: 'E-Commerce API is running', status: 'active' });

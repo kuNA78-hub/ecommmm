@@ -54,7 +54,7 @@ export default function SellerDashboard() {
         <Grid size={{ xs: 12, md: 4 }}>
           <Paper sx={{ p: 3, textAlign: 'center' }}>
             <Typography variant="h6" sx={{ color: 'text.secondary', mb: 1 }}>Revenue</Typography>
-            <Typography variant="h3" sx={{ fontWeight: 'bold' }}>${stats.revenue}</Typography>
+            <Typography variant="h3" sx={{ fontWeight: 'bold' }}>₹{stats.revenue}</Typography>
           </Paper>
         </Grid>
       </Grid>

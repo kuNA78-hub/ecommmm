@@ -50,13 +50,13 @@ export default function OrderHistory() {
               {order.items.map((item, idx) => (
                 <Typography key={idx} variant="body2" sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>{item.name} x {item.quantity}</span>
-                  <span>${item.price}</span>
+                  <span>₹{item.price}</span>
                 </Typography>
               ))}
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1, pt: 1, borderTop: '1px solid #e5e7eb' }}>
               <Typography variant="caption" sx={{ color: 'text.secondary' }}>{new Date(order.createdAt).toLocaleDateString()}</Typography>
-              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Total: ${order.totalAmount}</Typography>
+              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Total: ₹{order.totalAmount}</Typography>
             </Box>
           </Paper>
         ))

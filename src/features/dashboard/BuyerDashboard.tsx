@@ -33,7 +33,7 @@ export default function BuyerDashboard() {
         <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 3, textAlign: 'center' }}>
             <Typography variant="h6" sx={{ mb: 1 }}>Total Spent</Typography>
-            <Typography variant="h3" sx={{ fontWeight: 'bold' }}>${stats.totalSpent}</Typography>
+            <Typography variant="h3" sx={{ fontWeight: 'bold' }}>₹{stats.totalSpent}</Typography>
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
@@ -54,7 +54,7 @@ export default function BuyerDashboard() {
           <Paper key={order._id} sx={{ p: 2, mb: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography sx={{ fontWeight: 'medium' }}>Order #{order._id.slice(-6)}</Typography>
-              <Typography sx={{ fontWeight: 'bold' }}>${order.totalAmount}</Typography>
+              <Typography sx={{ fontWeight: 'bold' }}>₹{order.totalAmount}</Typography>
               <Typography
                 variant="caption"
                 sx={{

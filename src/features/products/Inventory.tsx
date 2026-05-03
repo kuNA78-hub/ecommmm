@@ -73,7 +73,7 @@ export default function Inventory() {
           {products.map(p => (
             <TableRow key={p._id}>
               <TableCell>{p.images?.[0] ? <img src={p.images[0]} alt={p.name} style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4 }} /> : 'No img'}</TableCell>
-              <TableCell>{p.name}</TableCell><TableCell>${p.price}</TableCell><TableCell>{p.stock}</TableCell><TableCell>{p.category}</TableCell>
+              <TableCell>{p.name}</TableCell><TableCell>₹{p.price}</TableCell><TableCell>{p.stock}</TableCell><TableCell>{p.category}</TableCell>
               <TableCell>
                 <IconButton onClick={() => { setEditingId(p._id); setForm(p); }}><EditIcon /></IconButton>
                 <IconButton onClick={() => handleDelete(p._id)}><DeleteIcon /></IconButton>

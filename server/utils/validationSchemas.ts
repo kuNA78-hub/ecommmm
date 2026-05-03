@@ -22,21 +22,18 @@ export const productSchema = z.object({
     description: z.string().optional()
 });
 
+// Security Improvement: Client only needs to send productId and quantity.
+// The server will fetch name and price from the database.
 export const orderItemsSchema = z.object({
     productId: z.string(),
-    name: z.string(),
-    price: z.number(),
     quantity: z.number().int().positive(),
 });
 
 export const orderSchema = z.object({
-    items: z.array(orderItemsSchema),
-    totalAmount: z.number(),
+    items: z.array(orderItemsSchema).min(1, 'At least one item is required'),
     shippingAddress: z.object({
-        street: z.string(),
-        city: z.string(),
-        zip: z.string(),
+        street: z.string().min(1, 'Street is required'),
+        city: z.string().min(1, 'City is required'),
+        zip: z.string().min(1, 'Zip code is required'),
     })
 });
-
-
