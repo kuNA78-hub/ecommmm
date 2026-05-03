@@ -17,7 +17,9 @@ export const inviteEmployee = async (req: AuthRequest, res: Response) => {
   }
 
   const existing = await Invitation.findOne({ email, sellerId, status: 'pending' });
-  if (existing) throw new AppError('Pending invitation already sent', 400);
+  if (existing) {
+    throw new AppError('Pending invitation already sent', 400);
+  }
 
   const token = crypto.randomBytes(32).toString('hex');
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);

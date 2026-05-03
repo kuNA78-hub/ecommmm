@@ -17,8 +17,15 @@ import type { JSX } from 'react';
 
 function ProtectedRoute({ children, roles }: { children: JSX.Element; roles?: string[] }) {
   const { user } = useAppSelector((state) => state.auth);
-  if (!user) return <Navigate to="/login" />;
-  if (roles && !roles.includes(user.role)) return <Navigate to="/" />;
+  
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+  
+  if (roles && !roles.includes(user.role)) {
+    return <Navigate to="/" />;
+  }
+  
   return children;
 }
 
@@ -55,3 +62,4 @@ function App() {
 }
 
 export default App;
+

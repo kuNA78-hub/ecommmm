@@ -20,10 +20,17 @@ export const getSellerProducts = async (req: AuthRequest, res: Response) => {
 export const updateProduct = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
   const data = productSchema.partial().parse(req.body);
+
   const product = await Product.findOne({ _id: id });
-  if (!product) throw new AppError('Product not found', 404);
+  if (!product) {
+    throw new AppError('Product not found', 404);
+  }
+
   const sellerId = req.user.role === 'seller' ? req.user.id : req.user.sellerId;
-  if (product.sellerId.toString() !== sellerId) throw new AppError('Unauthorized', 403);
+  if (product.sellerId.toString() !== sellerId) {
+    throw new AppError('Unauthorized', 403);
+  }
+
   Object.assign(product, data);
   await product.save();
   res.json(product);
@@ -31,19 +38,42 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
 
 export const deleteProduct = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
+
   const product = await Product.findOne({ _id: id });
-  if (!product) throw new AppError('Product not found', 404);
+  if (!product) {
+    throw new AppError('Product not found', 404);
+  }
+
   const sellerId = req.user.role === 'seller' ? req.user.id : req.user.sellerId;
-  if (product.sellerId.toString() !== sellerId) throw new AppError('Unauthorized', 403);
+  if (product.sellerId.toString() !== sellerId) {
+    throw new AppError('Unauthorized', 403);
+  }
+
   await product.deleteOne();
   res.status(204).send();
+};
+
+export const getProductById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const product = await Product.findById(id);
+  if (!product) {
+    throw new AppError('Product not found', 404);
+  }
+  res.json(product);
 };
 
 export const getAllProducts = async (req: Request, res: Response) => {
   const { category, search } = req.query;
   let filter: any = {};
-  if (category) filter.category = category;
-  if (search) filter.name = { $regex: search, $options: 'i' };
+  
+  if (category) {
+    filter.category = category;
+  }
+  
+  if (search) {
+    filter.name = { $regex: search, $options: 'i' };
+  }
+  
   const products = await Product.find(filter);
   res.json(products);
 };

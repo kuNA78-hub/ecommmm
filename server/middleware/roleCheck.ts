@@ -10,12 +10,18 @@ export const restrictTo = (...roles: string[]) => {
   };
 };
 
-// For seller/employee access to seller's resources
 export const isSellerOrEmployeeOf = (getSellerIdFromReq: (req: AuthRequest) => string) => {
   return async (req: AuthRequest, res: Response, next: NextFunction) => {
     const sellerId = getSellerIdFromReq(req);
-    if (req.user.role === 'seller' && req.user.id === sellerId) return next();
-    if (req.user.role === 'employee' && req.user.sellerId === sellerId) return next();
+    
+    if (req.user.role === 'seller' && req.user.id === sellerId) {
+      return next();
+    }
+    
+    if (req.user.role === 'employee' && req.user.sellerId === sellerId) {
+      return next();
+    }
+    
     return res.status(403).json({ message: 'Access denied' });
   };
 };
