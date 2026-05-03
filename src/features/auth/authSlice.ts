@@ -21,6 +21,7 @@ export const login = createAsyncThunk(
     try {
       const response = await api.post('/auth/login', credentials);
       const { user, accessToken } = response.data;
+      // Save both user and token in localStorage
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('token', accessToken);
       return { user, accessToken };
@@ -55,7 +56,7 @@ export const logout = createAsyncThunk(
     try {
       await api.post('/auth/logout');
     } catch (e) {
-      // ignore
+      // ignore network errors during logout
     } finally {
       localStorage.removeItem('user');
       localStorage.removeItem('token');
