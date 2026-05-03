@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { store } from '../store/store';
+import { logout } from '../features/auth/authSlice';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://ecommmm-gsre.onrender.com/api';
 
@@ -57,7 +58,7 @@ api.interceptors.response.use(
 
       const refreshToken = localStorage.getItem('refreshToken');
       if (!refreshToken) {
-        store.dispatch({ type: 'auth/logout' });
+        store.dispatch(logout());
         return Promise.reject(error);
       }
 
@@ -75,7 +76,7 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        store.dispatch({ type: 'auth/logout' });
+        store.dispatch(logout());
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
